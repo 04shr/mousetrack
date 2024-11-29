@@ -111,7 +111,7 @@ class GestureMouseController:
 
 def main():
     st.title("Advanced Hands-Free Mouse Control")
-    
+
     # System compatibility check
     try:
         import cv2
@@ -120,7 +120,7 @@ def main():
     except ImportError as e:
         st.error(f"Required library not found: {e}")
         st.stop()
-    
+
     # Gesture Guide
     st.markdown("""
     ### 🖱️ Gesture Controls
@@ -129,7 +129,7 @@ def main():
     - **Left Click**: Eyebrow Raise
     - **Right Click**: Head Tilt
     """)
-    
+
     # Warning and Tips
     st.info("""
     🚨 Tips:
@@ -137,75 +137,75 @@ def main():
     - Look directly at the camera
     - Make deliberate movements
     """)
-    
+
     # Initialize controller
     controller = GestureMouseController()
-    
+
     # Gesture activation toggle
     gesture_toggle = st.checkbox("Activate Gesture Control", key="gesture_active")
     controller.gesture_active = gesture_toggle
-    
+
     # Webcam capture
     cap = cv2.VideoCapture(0)
-    
+
     # Validate camera
     if not cap.isOpened():
         st.error("Error: Could not open webcam. Please check your camera connection.")
         return
-    
+
     # Streamlit image display
     frame_placeholder = st.empty()
-    
+
     while True:
         # Read frame
         ret, frame = cap.read()
-        
+
         if not ret:
             st.error("Failed to capture frame")
             break
-        
+
         # Flip frame
         frame = cv2.flip(frame, 1)
-        
+
         # Convert to grayscale for face detection
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        
+
         # Detect faces
         try:
             faces = controller.face_cascade.detectMultiScale(
-                gray, 
-                scaleFactor=1.1, 
-                minNeighbors=5, 
+                gray,
+                scaleFactor=1.1,
+                minNeighbors=5,
                 minSize=(30, 30)
             )
         except Exception as e:
             st.error(f"Face detection error: {e}")
             faces = []
-        
+
         if len(faces) > 0 and controller.gesture_active:
             # Get first face
             face = faces[0]
-            
+
             # Detect click gestures
             controller.detect_click_gestures(face, gray)
-            
+
             # Track head movement
             controller.track_head_movement(face, frame.shape)
-            
+
             # Draw face rectangle
             (x, y, w, h) = face
             cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        
+
         # Display frame
         frame_placeholder.image(frame, channels="BGR")
-        
+
         # Small delay
         time.sleep(0.05)
-        
+
         # Check if user wants to exit
         if not gesture_toggle:
             break
-    
+
     # Release resources
     cap.release()
 
