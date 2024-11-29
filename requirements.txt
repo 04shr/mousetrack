@@ -1,0 +1,4 @@
+streamlit==1.26.0  # For building the web app interface
+opencv-python-headless==4.8.0.74  # OpenCV for computer vision tasks (headless version for servers)
+numpy==1.26.0  # For numerical computations
+pyautogui==0.9.54  # For controlling the mouse
